@@ -21,11 +21,12 @@ app.use("/api/auth", authRoutes);
 app.use("/api/informasi", informasiRoutes);
 // app.use('/api/permintaan', permintaanRoutes);
 
+// Rute dasar untuk mengecek apakah server berjalan
 app.get("/", (req: Request, res: Response) => {
   res.send("PPID Garut Backend API is running!");
 });
 
-// Hanya jalankan server jika tidak dalam mode tes
+// Hanya jalankan server jika bukan dalam mode tes
 if (process.env.NODE_ENV !== "test") {
   app.listen(PORT, () => {
     console.log(
