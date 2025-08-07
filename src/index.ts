@@ -9,6 +9,8 @@ import informasiRoutes from "./routes/informasiRoutes";
 
 import keberatanRoutes from "./routes/keberatanRoutes";
 
+import adminRoutes from "./routes/adminRoutes";
+
 import tanggapanRoutes from "./routes/tanggapanRoutes";
 
 // Ubah const app menjadi export const app
@@ -24,6 +26,8 @@ app.use("/api/informasi", informasiRoutes);
 // app.use('/api/permintaan', permintaanRoutes);
 
 app.use("/api/keberatan", keberatanRoutes);
+
+app.use("/api/admin", adminRoutes);
 
 app.use("/api/tanggapan", tanggapanRoutes);
 

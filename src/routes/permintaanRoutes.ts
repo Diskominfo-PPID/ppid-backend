@@ -3,30 +3,42 @@ import {
   createPermintaan,
   getAllPermintaan,
   getPermintaanById,
-  updatePermintaanStatus,
+  assignPermohonan,
+  finalizePermohonan,
 } from "../controllers/permintaanController";
 import { verifyToken, authorizeRole } from "../middleware/authMiddleware";
 
 const router = Router();
 
-// Rute publik untuk mengajukan permintaan
+// Rute Publik
 router.post("/", createPermintaan);
 
-// --- Rute Admin ---
-const adminRoles = ["PPID", "Atasan_PPID"];
+// Rute untuk Monitoring (Atasan PPID & Admin)
+router.get(
+  "/",
+  verifyToken,
+  authorizeRole(["Atasan_PPID", "Admin", "PPID"]),
+  getAllPermintaan
+);
+router.get(
+  "/:id",
+  verifyToken,
+  authorizeRole(["Atasan_PPID", "Admin", "PPID"]),
+  getPermintaanById
+);
 
-// Rute admin untuk melihat semua permintaan
-router.get("/", verifyToken, authorizeRole(adminRoles), getAllPermintaan);
-
-// Rute admin untuk melihat detail satu permintaan
-router.get("/:id", verifyToken, authorizeRole(adminRoles), getPermintaanById);
-
-// Rute admin untuk mengubah status permintaan (hanya PPID)
-router.patch(
-  "/:id/status",
+// Rute Aksi untuk PPID Utama
+router.post(
+  "/:id/tugaskan",
   verifyToken,
   authorizeRole(["PPID"]),
-  updatePermintaanStatus
+  assignPermohonan
+);
+router.patch(
+  "/:id/finalisasi",
+  verifyToken,
+  authorizeRole(["PPID"]),
+  finalizePermohonan
 );
 
 export default router;

@@ -103,6 +103,44 @@ export const getPermintaanById = async (req: Request, res: Response) => {
   }
 };
 
+// Fungsi baru untuk PPID Utama menugaskan permohonan
+export const assignPermohonan = async (req: Request, res: Response) => {
+  const { id } = req.params; // no_pendaftaran
+  const { no_pegawai_pelaksana } = req.body;
+
+  if (!no_pegawai_pelaksana) {
+    return res
+      .status(400)
+      .json({ error: "Nomor pegawai PPID Pelaksana wajib diisi." });
+  }
+
+  try {
+    const { data, error } = await supabase
+      .from("permohonan_informasi")
+      .update({
+        ditugaskan_kepada: no_pegawai_pelaksana,
+        status_permohonan: "diteruskan_ke_pelaksana",
+      })
+      .eq("no_pendaftaran", id)
+      .select()
+      .single();
+
+    if (error) {
+      if (error.code === "23503")
+        return res
+          .status(404)
+          .json({ error: "PPID Pelaksana tidak ditemukan." });
+      throw error;
+    }
+    if (!data)
+      return res.status(404).json({ error: "Permohonan tidak ditemukan." });
+
+    res.status(200).json({ message: "Permohonan berhasil ditugaskan", data });
+  } catch (err: any) {
+    res.status(500).json({ error: err.message });
+  }
+};
+
 /**
  * Mengubah status permohonan (disetujui/ditolak) dan menambahkan alasan.
  * (Admin Only - PPID)
