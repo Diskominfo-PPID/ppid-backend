@@ -56,7 +56,19 @@ const seedUsers = async () => {
     if (atasanError) console.error('Error seeding Atasan PPID:', atasanError);
     else console.log('✅ Atasan PPID created');
 
-    // 4. Pemohon Test User
+    // 4. Admin
+    const { error: adminError } = await supabase
+      .from('admin')
+      .upsert({
+        email: 'admin@diskominfo.go.id',
+        hashed_password: defaultPassword,
+        nama: 'Administrator'
+      }, { onConflict: 'email' });
+
+    if (adminError) console.error('Error seeding Admin:', adminError);
+    else console.log('✅ Admin created');
+
+    // 5. Pemohon Test User
     const { error: pemohonError } = await supabase
       .from('pemohon')
       .upsert({
@@ -84,7 +96,11 @@ const seedUsers = async () => {
     console.log('   Email: atasan.ppid@diskominfo.go.id');
     console.log('   Password: ppid2024');
     console.log('');
-    console.log('4. Pemohon Test:');
+    console.log('4. Admin:');
+    console.log('   Email: admin@diskominfo.go.id');
+    console.log('   Password: ppid2024');
+    console.log('');
+    console.log('5. Pemohon Test:');
     console.log('   Email: pemohon.test@gmail.com');
     console.log('   Password: ppid2024');
     console.log('================================');
