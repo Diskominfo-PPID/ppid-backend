@@ -52,10 +52,9 @@ export const createPermintaan = async (
 };
 
 /**
- * Membuat permohonan informasi baru.
- * Endpoint ini bersifat publik.
+ * Membuat permohonan informasi baru (public endpoint).
  */
-export const createPermintaan = async (req: Request, res: Response) => {
+export const createPermintaanPublic = async (req: Request, res: Response) => {
   const { nama_pemohon, nik, email, informasi_diminta, tujuan } = req.body;
 
   if (!nama_pemohon || !nik || !email || !informasi_diminta || !tujuan) {
@@ -190,11 +189,7 @@ export const assignPermohonan = async (req: Request, res: Response) => {
   }
 };
 
-/**
- * Mengubah status permohonan (disetujui/ditolak) dan menambahkan alasan.
- * (Admin Only - PPID)
- */
-export const updatePermintaanStatus = async (req: Request, res: Response) => {
+export const finalizePermohonan = async (req: Request, res: Response) => {
   const { id } = req.params;
   const { status, alasan_penolakan } = req.body;
 

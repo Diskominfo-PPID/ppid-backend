@@ -5,53 +5,6 @@ import bcrypt from "bcryptjs";
 import jwt from "jsonwebtoken";
 
 export const register = async (req: Request, res: Response) => {
-  const { nama, nik, email, password, alamat, no_hp, pekerjaan } = req.body;
-
-  if (!nama || !nik || !email || !password) {
-    return res
-      .status(400)
-      .json({ error: "Nama, NIK, email, dan password wajib diisi." });
-  }
-
-  try {
-    const salt = await bcrypt.genSalt(10);
-    const hashedPassword = await bcrypt.hash(password, salt);
-
-    const { data, error } = await supabase
-      .from("pemohon_informasi_publik")
-      .insert([
-        {
-          nama,
-          nik_sk_badan_hukum: nik,
-          email,
-          hashed_password: hashedPassword,
-          alamat,
-          no_hp,
-          pekerjaan,
-        },
-      ])
-      .select("id_pemohon, nama, email, role")
-      .single();
-
-    if (error) {
-      if (error.code === "23505") {
-        // Error untuk data unik yang duplikat
-        return res
-          .status(409)
-          .json({ error: "Email atau NIK sudah terdaftar." });
-      }
-      throw error;
-    }
-
-    res.status(201).json({ message: "Registrasi berhasil", user: data });
-  } catch (err: any) {
-    res
-      .status(500)
-      .json({ error: "Gagal melakukan registrasi: " + err.message });
-  }
-};
-
-export const register = async (req: Request, res: Response) => {
   const { email, password, nama, no_telepon, alamat } = req.body;
   
   if (!email || !password || !nama) {
@@ -60,7 +13,7 @@ export const register = async (req: Request, res: Response) => {
 
   try {
     // Cek apakah email sudah terdaftar
-    const { data: existingUser } = await supabase
+    const { data: existingUser, error: checkError } = await supabase
       .from("pemohon")
       .select("email")
       .eq("email", email)
@@ -152,12 +105,12 @@ export const login = async (req: Request, res: Response) => {
 
     // 4. Terakhir, cek di tabel pemohon
     if (!user) {
-      const { data: pemohonUser } = await supabase
+      const { data: pemohonUser, error: pemohonError } = await supabase
         .from("pemohon")
         .select("*")
         .eq("email", email)
         .single();
-      if (pemohonUser) {
+      if (pemohonUser && !pemohonError) {
         user = pemohonUser;
         role = "Pemohon";
         userId = pemohonUser.id;
