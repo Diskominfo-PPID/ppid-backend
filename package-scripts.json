@@ -1,0 +1,3 @@
+{
+  "seed": "npx ts-node src/scripts/seedUsers.ts"
+}

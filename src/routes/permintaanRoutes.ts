@@ -10,8 +10,8 @@ import { verifyToken, authorizeRole } from "../middleware/authMiddleware";
 
 const router = Router();
 
-// Rute Publik
-router.post("/", createPermintaan);
+// Rute ini sekarang dilindungi
+router.post("/", verifyToken, authorizeRole(["Pemohon"]), createPermintaan);
 
 // Rute untuk Monitoring (Atasan PPID & Admin)
 router.get(

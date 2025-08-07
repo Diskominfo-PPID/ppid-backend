@@ -1,6 +1,55 @@
 import { Request, Response } from "express";
 import { supabase } from "../lib/supabaseClient";
+import { AuthenticatedRequest } from "../types/custom.types";
 import { v4 as uuidv4 } from "uuid";
+
+export const createPermintaan = async (
+  req: AuthenticatedRequest,
+  res: Response
+) => {
+  // Ambil ID pemohon dari token yang sudah diverifikasi oleh middleware
+  const id_pemohon = req.user?.userId;
+
+  if (!id_pemohon) {
+    return res
+      .status(403)
+      .json({ error: "Akses ditolak. ID Pemohon tidak ditemukan di token." });
+  }
+
+  // Data pemohon tidak lagi diambil dari body
+  const { informasi_diminta, tujuan } = req.body;
+
+  if (!informasi_diminta || !tujuan) {
+    return res
+      .status(400)
+      .json({ error: "Informasi yang diminta dan tujuan wajib diisi." });
+  }
+
+  try {
+    const no_pendaftaran = `REQ-${Date.now()}`;
+
+    const { data: permintaan, error } = await supabase
+      .from("permohonan_informasi")
+      .insert([
+        {
+          no_pendaftaran,
+          id_pemohon: id_pemohon, // Gunakan ID dari token
+          rincian_informasi_diminta: informasi_diminta,
+          tujuan_penggunaan_informasi: tujuan,
+        },
+      ])
+      .select()
+      .single();
+
+    if (error) throw error;
+
+    res
+      .status(201)
+      .json({ message: "Permintaan berhasil dikirim", data: permintaan });
+  } catch (err: any) {
+    res.status(500).json({ error: "Gagal membuat permohonan: " + err.message });
+  }
+};
 
 /**
  * Membuat permohonan informasi baru.
