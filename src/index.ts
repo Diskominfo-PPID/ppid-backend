@@ -1,5 +1,3 @@
-// src/index.ts
-
 import "dotenv/config";
 import express, { Application, Request, Response } from "express";
 import cors from "cors";
@@ -8,6 +6,10 @@ import cors from "cors";
 import authRoutes from "./routes/authRoutes";
 import informasiRoutes from "./routes/informasiRoutes";
 // import permintaanRoutes from './routes/permintaanRoutes';
+
+import keberatanRoutes from "./routes/keberatanRoutes";
+
+import tanggapanRoutes from "./routes/tanggapanRoutes";
 
 // Ubah const app menjadi export const app
 export const app: Application = express();
@@ -20,6 +22,10 @@ app.use(express.json());
 app.use("/api/auth", authRoutes);
 app.use("/api/informasi", informasiRoutes);
 // app.use('/api/permintaan', permintaanRoutes);
+
+app.use("/api/keberatan", keberatanRoutes);
+
+app.use("/api/tanggapan", tanggapanRoutes);
 
 // Rute dasar untuk mengecek apakah server berjalan
 app.get("/", (req: Request, res: Response) => {
